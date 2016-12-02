@@ -1,17 +1,27 @@
 #!/bin/sh
 
-#PORT=8000
-#
-#if [[ $# -eq 1 ]]; then
-#  PORT=$1
-#fi
+PORT1=11211
+PORT2=11212
 
-#./memcached/memcached -vvvv -d -p 11211 &
-#./memcached/memcached -vvvv -d -p 11212 &
+if [[ $# -eq 1 ]]; then
+  PORT1=$1
+elif [[ $# -eq 2 ]]; then
+  PORT1=$1
+  PORT2=$2
+fi
 
-./memcached/memcached -d -p 11211 &
-./memcached/memcached -d -p 11212 &
+# SUPER VERBOSE
+#./memcached/memcached -vvvv -d -p $PORT1 &
+#./memcached/memcached -vvvv -d -p $PORT2 &
 
-sleep 1 # wait for 1 second for memcache servers to start
+./memcached/memcached -d -p $PORT1 &
+./memcached/memcached -d -p $PORT2 &
+
+sleep 2 # wait for 2 second for memcache servers to start
 
 go run client/client.go
+
+
+echo "\n\nYou may want to kill the memcache servers now to prevent zombie processes"
+ps axl | grep memcached
+# `kill -9 <pid>`

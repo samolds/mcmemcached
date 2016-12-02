@@ -2,11 +2,16 @@
 Class Project for University of Utah [Distributed Systems](http://www.cs.utah.edu/~stutsman/cs6963)
 
 
-## Getting Client Memcache up and Running
+## Dependencies
+* `wget`
+* `apt-get` (ubuntu) OR `brew` (osx)
 
-Make sure your GOPATH is set
+
+## Getting client memcache running up against memcache server on fresh ubuntu
 
 ```sh
-go get github.com/bradfitz/gomemcache/memcache
-go run client/client.go
+git clone https://cs6963.utah.systems/u0810837/memcached.git
+cd memcached
+./setup.sh
+./run.sh
 ```
