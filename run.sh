@@ -11,11 +11,11 @@ elif [[ $# -eq 2 ]]; then
 fi
 
 # SUPER VERBOSE
-#./memcached/memcached -vvvv -d -p $PORT1 &
-#./memcached/memcached -vvvv -d -p $PORT2 &
+#./memcached/memcached -vvvv -d -p $PORT1
+#./memcached/memcached -vvvv -d -p $PORT2
 
-./memcached/memcached -d -p $PORT1 &
-./memcached/memcached -d -p $PORT2 &
+./memcached/memcached -d -p $PORT1
+./memcached/memcached -d -p $PORT2
 
 sleep 2 # wait for 2 second for memcache servers to start
 
@@ -24,4 +24,5 @@ go run client/client.go
 
 echo "\n\nYou may want to kill the memcache servers now to prevent zombie processes"
 ps axl | grep memcached
-# `kill -9 <pid>`
+echo "You can easily kill these processes with:"
+echo "$ kill -9 <pid (second column)>"
