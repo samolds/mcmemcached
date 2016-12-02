@@ -50,3 +50,17 @@
 /memcached/*.su
 /memcached/*.idb
 /memcached/*.pdb
+
+memcached/doc/Makefile
+memcached/.deps/
+memcached/Makefile
+memcached/config.h
+memcached/config.log
+memcached/config.status
+memcached/memcached
+memcached/memcached-debug
+memcached/memcached_debug*
+memcached/sizes
+memcached/stamp-h1
+memcached/testapp
+memcached/timedrun

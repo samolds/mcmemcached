@@ -3,6 +3,7 @@ ARCH=""
 # install memcached deps
 if type "apt-get" > /dev/null 2>&1 && ! type "brew" > /dev/null 2>&1; then
   # apt-get exists but brew does not
+  sudo apt-get update
   sudo apt-get install libevent-dev
   ARCH="unix"
 elif ! type "apt-get" > /dev/null 2>&1 && type "brew" > /dev/null 2>&1; then
@@ -32,11 +33,13 @@ sudo make install
 cd ..
 
 
-# download and install go
-wget https://storage.googleapis.com/golang/go1.7.3.linux-amd64.tar.gz
-sudo tar -C /usr/local -xzf go1.7.3.linux-amd64.tar.gz
-rm -f go1.7.3.linux-amd64.tar.gz
-export PATH=$PATH:/usr/local/go/bin
+# download and install go if you don't already have it
+if type "go" > /dev/null 2>&1; then
+  wget https://storage.googleapis.com/golang/go1.7.3.linux-amd64.tar.gz
+  sudo tar -C /usr/local -xzf go1.7.3.linux-amd64.tar.gz
+  rm -f go1.7.3.linux-amd64.tar.gz
+  export PATH=$PATH:/usr/local/go/bin
+fi
 export GOPATH=`pwd`
 
 
