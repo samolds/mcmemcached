@@ -19,7 +19,7 @@ fi
 
 sleep 2 # wait for 2 second for memcache servers to start
 
-go run client/client.go
+go run client/*.go
 
 
 echo ""

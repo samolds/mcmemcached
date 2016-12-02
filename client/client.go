@@ -15,7 +15,10 @@ func main() {
 
 	// initialize random number generator with a zipfian distribution
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	zipf := rand.NewZipf(r, 3.12, 2.72, 5000)
+	zipf := rand.NewZipf(r, 3.12, 2.72, 50000)
+
+	// print out the generated key distribution at the end
+	key_distribution := make(map[string]int)
 
 	// keep track of the number of cache misses
 	cache_misses := 0
@@ -24,9 +27,10 @@ func main() {
 	database_delay := 1
 
 	// simulate n cache requests
-	n := 100
+	n := 100000
 	for i := 0; i < n; i++ {
 		key := strconv.Itoa(int(zipf.Uint64())) // convert to string
+		key_distribution[key]++
 
 		// try and get the key from the cache
 		item, err := mc.Get(key) // returns item, err
@@ -45,4 +49,6 @@ func main() {
 	}
 
 	log.Printf("Got %d cache misses", cache_misses)
+	log.Printf("Key access distribtuion {key access_count}: %v",
+		orderByValue(key_distribution))
 }
