@@ -1,0 +1,52 @@
+*.swp
+.DS_Store
+
+## if GOPATH is root of repo, ./setup.sh will install go deps here: ##
+/pkg/
+/src/
+
+
+## TAKEN FROM https://github.com/github/gitignore/blob/master/C.gitignore ##
+# Prerequisites
+/memcached/*.d
+
+# Object files
+/memcached/*.o
+/memcached/*.ko
+/memcached/*.obj
+/memcached/*.elf
+
+# Linker output
+/memcached/*.ilk
+/memcached/*.map
+/memcached/*.exp
+
+# Precompiled Headers
+/memcached/*.gch
+/memcached/*.pch
+
+# Libraries
+/memcached/*.lib
+/memcached/*.a
+/memcached/*.la
+/memcached/*.lo
+
+# Shared objects (inc. Windows DLLs)
+/memcached/*.dll
+/memcached/*.so
+/memcached/*.so.*
+/memcached/*.dylib
+
+# Executables
+/memcached/*.exe
+/memcached/*.out
+/memcached/*.app
+/memcached/*.i*86
+/memcached/*.x86_64
+/memcached/*.hex
+
+# Debug files
+/memcached/*.dSYM/
+/memcached/*.su
+/memcached/*.idb
+/memcached/*.pdb
