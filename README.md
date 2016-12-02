@@ -10,8 +10,8 @@ Class Project for University of Utah [Distributed Systems](http://www.cs.utah.ed
 ## Getting client memcache running up against memcache server on fresh ubuntu
 
 ```sh
-git clone https://cs6963.utah.systems/u0810837/memcached.git
-cd memcached
+git clone https://cs6963.utah.systems/u0810837/memcached.git mcmemcached
+cd mcmemcached
 ./setup.sh
 ./run.sh
 ```

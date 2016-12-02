@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # https://www.hacksparrow.com/install-memcached-on-mac-os-x.html
 # http://mac-dev-env.patrickbougie.com/memcached/
 # https://github.com/memcached/memcached/wiki/TutorialCachingStory
