@@ -51,6 +51,7 @@
 /memcached/*.idb
 /memcached/*.pdb
 
+/memcached/doc/Makefile
 /memcached/.deps/
 /memcached/Makefile
 /memcached/config.h
@@ -63,3 +64,4 @@
 /memcached/stamp-h1
 /memcached/testapp
 /memcached/timedrun
+/memcached/autom4te.cache/

@@ -33,6 +33,11 @@ echo "./configure --prefix=/usr/local/memcached"
 if [ "$ARCH" = "osx" ]; then
   ./configure --prefix=/usr/local/memcached --with-libevent=/usr/local/lib/libevent
 elif [ "$ARCH" = "unix" ]; then
+  # update timestamps for weird bug explained here: http://stackoverflow.com/a/33279062
+  touch aclocal.m4 configure
+  touch Makefile.am
+  touch Makefile.in
+
   ./configure --prefix=/usr/local/memcached
 else
   exit 1
@@ -55,11 +60,11 @@ if ! type "go" > /dev/null 2>&1; then
   rm -f go1.7.3.linux-amd64.tar.gz
   echo "export PATH=$PATH:/usr/local/go/bin" >> ~/.bashrc
 fi
-echo "export GOPATH=$GOPATH:`pwd`" >> ~/.bashrc
-source ~/.bashrc
+echo "export GOPATH=`pwd`" >> ~/.bashrc
+export GOPATH=`pwd`
 
 
 # download  and install go deps
 echo ""
 echo "go get github.com/bradfitz/gomemcache/memcache"
-go get github.com/bradfitz/gomemcache/memcache
+/usr/local/go/bin/go get github.com/bradfitz/gomemcache/memcache
