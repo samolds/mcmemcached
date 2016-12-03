@@ -17,3 +17,11 @@ source ~/.bashrc
 
 ./run.sh
 ```
+
+
+## To make changes to memcache source and run full tamale
+* `cd memcache`
+* Edit memcache source as desired
+* `make`
+* `cd ..`
+* `./run.sh`

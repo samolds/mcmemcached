@@ -5713,6 +5713,8 @@ int main (int argc, char **argv) {
     /* set stderr non-buffering (for running under, say, daemontools) */
     setbuf(stderr, NULL);
 
+    fprintf(stdout, "SAM - CUSTOM MEMCACHE CHANGE\n");
+
     /* process arguments */
     while (-1 != (c = getopt(argc, argv,
           "a:"  /* access mask for unix socket */
