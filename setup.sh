@@ -29,25 +29,24 @@ fi
 cd memcached
 
 echo ""
-echo "./configure --prefix=/usr/local/memcached"
+echo "./configure"
 if [ "$ARCH" = "osx" ]; then
-  ./configure --prefix=/usr/local/memcached --with-libevent=/usr/local/lib/libevent
+  ./configure --prefix=`pwd` --with-libevent=/usr/local/lib/libevent
 elif [ "$ARCH" = "unix" ]; then
   # update timestamps for weird bug explained here: http://stackoverflow.com/a/33279062
   touch aclocal.m4 configure
   touch Makefile.am
   touch Makefile.in
 
-  ./configure --prefix=/usr/local/memcached
+  ./configure --prefix=`pwd`
 else
   exit 1
 fi
 
 echo ""
-echo "make && sudo make install"
+echo "make"
 make
 #make test
-sudo make install
 cd ..
 
 
