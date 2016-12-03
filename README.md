@@ -25,3 +25,8 @@ source ~/.bashrc
 * `make`
 * `cd ..`
 * `./run.sh`
+
+
+# References
+* [Facebook Memcache](http://www.cs.utah.edu/~stutsman/cs6963/public/papers/memcached.pdf)
+* [Saving Cash by Using Less Cache](http://www.cs.cmu.edu/~harchol/Papers/HotCloud12.pdf)
