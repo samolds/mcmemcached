@@ -34,9 +34,7 @@ if [ "$ARCH" = "osx" ]; then
   ./configure --prefix=`pwd` --with-libevent=/usr/local/lib/libevent
 elif [ "$ARCH" = "unix" ]; then
   # update timestamps for weird bug explained here: http://stackoverflow.com/a/33279062
-  touch aclocal.m4 configure
-  touch Makefile.am
-  touch Makefile.in
+  touch aclocal.m4 configure Makefile.am Makefile.in
 
   ./configure --prefix=`pwd`
 else
@@ -61,9 +59,3 @@ if ! type "go" > /dev/null 2>&1; then
 fi
 echo "export GOPATH=`pwd`" >> ~/.bashrc
 export GOPATH=`pwd`
-
-
-# download  and install go deps
-echo ""
-echo "go get github.com/rainycape/memcache"
-/usr/local/go/bin/go get github.com/rainycape/memcache

@@ -1,11 +1,6 @@
 *.swp
 .DS_Store
 
-## if GOPATH is root of repo, ./setup.sh will install go deps here: ##
-/pkg/
-/src/github.com/
-
-
 ## TAKEN FROM https://github.com/github/gitignore/blob/master/C.gitignore ##
 # Prerequisites
 /memcached/*.d
