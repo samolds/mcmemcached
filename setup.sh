@@ -65,5 +65,5 @@ export GOPATH=`pwd`
 
 # download  and install go deps
 echo ""
-echo "go get github.com/bradfitz/gomemcache/memcache"
-/usr/local/go/bin/go get github.com/bradfitz/gomemcache/memcache
+echo "go get github.com/rainycape/memcache"
+/usr/local/go/bin/go get github.com/rainycape/memcache

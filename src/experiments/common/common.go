@@ -1,12 +1,16 @@
-package main
+package common
 
 import (
 	"sort"
 )
 
+var (
+  MCACHES = []string{"localhost:11211", "localhost:11212", "localhost:11212", "localhost:11212"}
+)
+
 // used for ordering a map[string]int by the values
 // found here: http://stackoverflow.com/a/18695740
-func orderByValue(stringIntMap map[string]int) PairList {
+func OrderByValue(stringIntMap map[string]int) PairList {
 	pl := make(PairList, len(stringIntMap))
 	i := 0
 	for k, v := range stringIntMap {

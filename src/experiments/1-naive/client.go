@@ -6,12 +6,18 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/bradfitz/gomemcache/memcache"
+  "experiments/common"
+
+	"github.com/rainycape/memcache"
 )
 
 func main() {
 	// cold cache = not initialized
-	mc := memcache.New("localhost:11211", "localhost:11212")
+	mc, err := memcache.New(common.MCACHES[0], common.MCACHES[1], common.MCACHES[2])
+  if err != nil {
+    log.Fatal(err)
+    return
+  }
 
 	// initialize random number generator with a zipfian distribution
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -50,5 +56,5 @@ func main() {
 
 	log.Printf("Got %d cache misses", cache_misses)
 	log.Printf("Key access distribtuion {key access_count}: %v",
-		orderByValue(key_distribution))
+		common.OrderByValue(key_distribution))
 }

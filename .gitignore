@@ -3,7 +3,7 @@
 
 ## if GOPATH is root of repo, ./setup.sh will install go deps here: ##
 /pkg/
-/src/
+/src/github.com/
 
 
 ## TAKEN FROM https://github.com/github/gitignore/blob/master/C.gitignore ##
