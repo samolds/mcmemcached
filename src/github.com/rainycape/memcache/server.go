@@ -1,9 +1,9 @@
 package memcache
 
 import (
-	"hash/crc32"
 	"net"
 	"strings"
+    "github.com/consistent"
 )
 
 // Servers is the interface used to manage a set of memcached
@@ -25,6 +25,7 @@ type Servers interface {
 // To initialize a ServerList use NewServerList.
 type ServerList struct {
 	addrs []*Addr
+    chash *consistent.Consistent
 }
 
 // NewServerList returns a new ServerList with the given servers.
@@ -35,8 +36,14 @@ type ServerList struct {
 // is not valid or fails to resolve, but it doesn't try to connect
 // to the provided servers.
 func NewServerList(servers ...string) (*ServerList, error) {
+
+    // Create new consistent hash map
+    chash := consistent.New()
+
 	addrs := make([]*Addr, len(servers))
 	for i, server := range servers {
+        // Add server to consistent hash map
+        chash.Add(server)
 		if strings.Contains(server, "/") {
 			addr, err := net.ResolveUnixAddr("unix", server)
 			if err != nil {
@@ -51,15 +58,24 @@ func NewServerList(servers ...string) (*ServerList, error) {
 			addrs[i] = NewAddr(tcpaddr)
 		}
 	}
-	return &ServerList{addrs: addrs}, nil
+    return &ServerList{addrs: addrs, chash: chash}, nil
 }
 
 func (s *ServerList) PickServer(key string) (*Addr, error) {
 	if len(s.addrs) == 0 {
 		return nil, ErrNoServers
 	}
-	cs := crc32.ChecksumIEEE(stobs(key))
-	return s.addrs[cs%uint32(len(s.addrs))], nil
+
+    server, err := s.chash.Get(key)
+    server_index := 0
+
+    for key,val := range s.addrs {
+        if val.String() == server {
+            server_index = key
+        }
+    }
+
+    return s.addrs[server_index], err
 }
 
 func (s *ServerList) Servers() ([]*Addr, error) {
