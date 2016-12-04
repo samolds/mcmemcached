@@ -5,9 +5,7 @@ PORT2=11212
 PORT3=11213
 PORT4=11214
 
-if [ $# -eq 1 ]; then
-  PORT1=$1
-elif [ $# -eq 4 ]; then
+if [ $# -eq 4 ]; then
   PORT1=$1
   PORT2=$2
   PORT3=$3
