@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-  "experiments/common"
+	"experiments/common"
 
 	"github.com/rainycape/memcache"
 )
@@ -14,10 +14,10 @@ import (
 func main() {
 	// cold cache = not initialized
 	mc, err := memcache.New(common.MCACHES[0], common.MCACHES[1], common.MCACHES[2])
-  if err != nil {
-    log.Fatal(err)
-    return
-  }
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
 
 	// initialize random number generator with a zipfian distribution
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))

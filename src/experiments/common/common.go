@@ -5,7 +5,7 @@ import (
 )
 
 var (
-  MCACHES = []string{"localhost:11211", "localhost:11212", "localhost:11212", "localhost:11212"}
+	MCACHES = []string{"localhost:11211", "localhost:11212", "localhost:11212", "localhost:11212"}
 )
 
 // used for ordering a map[string]int by the values
