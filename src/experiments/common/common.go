@@ -63,6 +63,7 @@ func RevealKeyOwners(mc *memcache.Client, key_distributions map[string]int) (
 
 		// perform a get to see if the key even exists on the memcache servers
 		_, err := mc.Get(key)
+		// no error means the key exists on the server
 		if err == nil {
 			// figure out which server the key would be put on
 			server, err := mc.Servers.PickServer(key)
@@ -71,6 +72,7 @@ func RevealKeyOwners(mc *memcache.Client, key_distributions map[string]int) (
 			}
 			server_str := server.String()
 
+			// adds the key into the map for the server it belonged to
 			key_owners[server_str] = append(key_owners[server_str], key)
 		}
 	}
