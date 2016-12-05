@@ -19,6 +19,29 @@ source ~/.bashrc
 ```
 
 
+## Experiments
+
+There are 4 main experiments, located in `src/experiments/`. If you have the
+memcache servers running, you can run them with:
+
+```
+go run src/experiments/<dir>/<filename>.go
+```
+
+OR, you can use the provided `./run.sh` shell script. If provided 1 of the
+following arguments, it will spin up the memcache servers and run the associated
+experiment against the servers:
+
+| Command | Experiment Source |
+| --- | --- |
+| `./run.sh` | `src/experiments/1naive/client_zipf.go` |
+| `./run.sh 1z` | `src/experiments/1naive/client_zipf.go` |
+| `./run.sh 1n` | `src/experiments/1naive/client_n.go` |
+| `./run.sh 2` | `src/experiments/2coldstart/client.go` |
+| `./run.sh 3` | `src/experiments/3querycold/client.go` |
+| `./run.sh 4` | `src/experiments/4hotkey/client.go` |
+
+
 ## To make changes to memcache source and run full tamale
 * `cd memcache`
 * Edit memcache source as desired

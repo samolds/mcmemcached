@@ -58,9 +58,9 @@ func main() {
 		_, err := active_mc.Get(key) // returns item, err
 		if err == memcache.ErrCacheMiss {
 			// if active_mc == config2 {
-			// TODO(sam): add optimizations here. when there is a cache miss after a
-			// new server has been added and it is within a threshold of being new,
-			// refer back to the old memcache server instead of "going to the db"
+			// TODO: add optimizations here. when there is a cache miss after a new
+			// server has been added and it is within a threshold of being new, refer
+			// back to the old memcache server instead of "going to the db"
 			// } else {
 			// sleep here to simulate call to db to get value to add to cache
 			time.Sleep(time.Duration(database_delay) * time.Millisecond)
@@ -83,8 +83,6 @@ func main() {
 			log.Printf("\tAdded new server!! cache misses: %d, requests sent: %d\n",
 				cache_misses, i)
 			active_mc = config2
-			// TODO(sam): add optimizations here. additional memcache server will be
-			// cold and will need to be caught up with existing key/value pairs
 		}
 	}
 
