@@ -4,7 +4,7 @@ import "sort"
 import "fmt"
 
 var (
-	MCACHES = []string{"localhost:11211", "localhost:11212", "localhost:11212", "localhost:11212"}
+	MCACHES = []string{"localhost:11211", "localhost:11212", "localhost:11213", "localhost:11214"}
 )
 
 // time stored in milliseconds
