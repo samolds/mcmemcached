@@ -27,10 +27,5 @@ sleep 2 # wait for 2 second for memcache servers to start
 
 go run src/experiments/1-naive/client.go
 
-
-echo ""
-echo ""
-echo "You may want to kill the memcache servers now to prevent zombie processes"
-ps axl | grep memcached
-echo "You can easily kill these processes with:"
-echo "$ kill -9 <pid (second column)>"
+# kills all 4 memcache servers (as well as any other processes named "memcached"
+killall -9 memcached
