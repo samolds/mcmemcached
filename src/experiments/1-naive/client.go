@@ -35,7 +35,7 @@ func main() {
 
 	// initialize random number generator with a zipfian distribution
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	zipf := rand.NewZipf(r, 3.12, 2.72, 50000)
+	zipf := rand.NewZipf(r, 1.1, 5.0, 50000)
 
 	// print out the generated key distribution at the end
 	key_distribution := make(map[string]int)
@@ -44,7 +44,7 @@ func main() {
 	cache_misses := 0
 
 	// fake database delay in milliseconds
-	database_delay := 8
+	database_delay := 1 // want 8, but i don't like waiting so i set it to 1 for now
 
 	// simulate n cache requests
 	n := 100000
@@ -73,9 +73,6 @@ func main() {
 			log.Printf("\tUsing key: '%s', cache hit! value: '%#v'", key,
 				string(item.Value))
 		}
-
-		// TODO(sam): distribution isn't great right now = we're getting about
-		// 0.0012% cache miss rate, which is too low
 
 		// after the first 1000 cache requests to give servers time to "warm up",
 		// if there have been more than 0.001% cache misses for the requests thus far,

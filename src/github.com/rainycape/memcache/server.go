@@ -1,9 +1,9 @@
 package memcache
 
 import (
+	"github.com/consistent"
 	"net"
 	"strings"
-    "github.com/consistent"
 )
 
 // Servers is the interface used to manage a set of memcached
@@ -25,7 +25,7 @@ type Servers interface {
 // To initialize a ServerList use NewServerList.
 type ServerList struct {
 	addrs []*Addr
-    chash *consistent.Consistent
+	chash *consistent.Consistent
 }
 
 // NewServerList returns a new ServerList with the given servers.
@@ -37,13 +37,13 @@ type ServerList struct {
 // to the provided servers.
 func NewServerList(servers ...string) (*ServerList, error) {
 
-    // Create new consistent hash map
-    chash := consistent.New()
+	// Create new consistent hash map
+	chash := consistent.New()
 
 	addrs := make([]*Addr, len(servers))
 	for i, server := range servers {
-        // Add server to consistent hash map
-        chash.Add(server)
+		// Add server to consistent hash map
+		chash.Add(server)
 		if strings.Contains(server, "/") {
 			addr, err := net.ResolveUnixAddr("unix", server)
 			if err != nil {
@@ -58,7 +58,7 @@ func NewServerList(servers ...string) (*ServerList, error) {
 			addrs[i] = NewAddr(tcpaddr)
 		}
 	}
-    return &ServerList{addrs: addrs, chash: chash}, nil
+	return &ServerList{addrs: addrs, chash: chash}, nil
 }
 
 func (s *ServerList) PickServer(key string) (*Addr, error) {
@@ -66,16 +66,16 @@ func (s *ServerList) PickServer(key string) (*Addr, error) {
 		return nil, ErrNoServers
 	}
 
-    server, err := s.chash.Get(key)
-    server_index := 0
+	server, err := s.chash.Get(key)
+	server_index := 0
 
-    for key,val := range s.addrs {
-        if val.String() == server {
-            server_index = key
-        }
-    }
+	for key, val := range s.addrs {
+		if val.String() == server {
+			server_index = key
+		}
+	}
 
-    return s.addrs[server_index], err
+	return s.addrs[server_index], err
 }
 
 func (s *ServerList) Servers() ([]*Addr, error) {
