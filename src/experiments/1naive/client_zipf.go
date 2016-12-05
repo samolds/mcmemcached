@@ -32,8 +32,13 @@ func main() {
 	// keep track of the number of cache misses
 	cache_misses := 0
 
+	// fake memcached fetch delay
+	var fetch_delay float32 = 0.3
+
 	// fake database delay in milliseconds
-	database_delay := 1 // want 8, but i don't like waiting so i set it to 1 for now
+	var database_delay float32 = 8.0
+
+	var stats common.TimeStats
 
 	// simulate n cache requests
 	n := 100000
@@ -45,7 +50,7 @@ func main() {
 		//item, err := mc.Get(key) // returns item, err
 		_, err := mc.Get(key) // returns item, err
 		if err == memcache.ErrCacheMiss {
-			time.Sleep(time.Duration(database_delay) * time.Millisecond)
+			common.AddDelayPoint(&stats, database_delay)
 
 			// cache miss, so add the key/value to the cache
 			cache_misses++
@@ -53,6 +58,7 @@ func main() {
 
 			//log.Printf("Using key: '%s', cache miss! adding to cache", key)
 		} else {
+			common.AddDelayPoint(&stats, fetch_delay)
 			//log.Printf("\tUsing key: '%s', cache hit! value: '%#v'", key,
 			//	string(item.Value))
 		}
@@ -61,4 +67,5 @@ func main() {
 	log.Printf("Key access distribtuion {key access_count}: %v",
 		common.OrderByValue(key_distribution))
 	log.Printf("Got %d cache misses for %d requests", cache_misses, n)
+	common.WriteTimeStats(&stats)
 }
