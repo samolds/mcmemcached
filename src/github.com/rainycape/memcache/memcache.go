@@ -214,9 +214,9 @@ func New(server ...string) (*Client, error) {
 // NewFromServers returns a new Client using the provided Servers.
 func NewFromServers(servers Servers) *Client {
 	return &Client{
+		Servers:        servers,
 		timeout:        DefaultTimeout,
 		maxIdlePerAddr: maxIdleConnsPerAddr,
-		servers:        servers,
 		freeconn:       make(map[string]chan *conn),
 		bufPool:        make(chan []byte, poolSize()),
 	}
@@ -225,9 +225,9 @@ func NewFromServers(servers Servers) *Client {
 // Client is a memcache client.
 // It is safe for unlocked use by multiple concurrent goroutines.
 type Client struct {
+	Servers        Servers
 	timeout        time.Duration
 	maxIdlePerAddr int
-	servers        Servers
 	mu             sync.RWMutex
 	freeconn       map[string]chan *conn
 	bufPool        chan []byte
@@ -456,7 +456,7 @@ func (c *Client) Get(key string) (*Item, error) {
 }
 
 func (c *Client) sendCommand(key string, cmd command, value []byte, casid uint64, extras []byte) (*conn, error) {
-	addr, err := c.servers.PickServer(key)
+	addr, err := c.Servers.PickServer(key)
 	if err != nil {
 		return nil, err
 	}
@@ -609,7 +609,7 @@ func (c *Client) parseItemResponse(key string, cn *conn, release bool) (*Item, e
 func (c *Client) GetMulti(keys []string) (map[string]*Item, error) {
 	keyMap := make(map[*Addr][]string)
 	for _, key := range keys {
-		addr, err := c.servers.PickServer(key)
+		addr, err := c.Servers.PickServer(key)
 		if err != nil {
 			return nil, err
 		}
@@ -745,7 +745,7 @@ func (c *Client) incrDecr(cmd command, key string, delta uint64) (uint64, error)
 // Flush removes all the items in the cache after expiration seconds. If
 // expiration is <= 0, it removes all the items right now.
 func (c *Client) Flush(expiration int) error {
-	servers, err := c.servers.Servers()
+	servers, err := c.Servers.Servers()
 	var failed []*Addr
 	var errs []error
 	if err != nil {

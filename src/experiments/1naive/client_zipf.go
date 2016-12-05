@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io/ioutil"
 	"log"
 	"math/rand"
 	"strconv"
@@ -40,6 +41,14 @@ func main() {
 
 	var stats common.TimeStats
 
+	// read in a file that contains the value that will be set for every memcache
+	// key/value pair
+	memcache_value, err := ioutil.ReadFile("data/memcache_value.txt")
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
 	// simulate n cache requests
 	n := 100000
 	for i := 0; i < n; i++ {
@@ -54,7 +63,7 @@ func main() {
 
 			// cache miss, so add the key/value to the cache
 			cache_misses++
-			mc.Set(&memcache.Item{Key: key, Value: []byte("fake value")})
+			mc.Set(&memcache.Item{Key: key, Value: memcache_value})
 
 			//log.Printf("Using key: '%s', cache miss! adding to cache", key)
 		} else {
@@ -64,8 +73,22 @@ func main() {
 		}
 	}
 
-	log.Printf("Key access distribtuion {key access_count}: %v",
-		common.OrderByValue(key_distribution))
+	//log.Printf("Key access distribtuion {key access_count}: %v",
+	//	common.OrderByValue(key_distribution))
 	log.Printf("Got %d cache misses for %d requests", cache_misses, n)
-	common.WriteTimeStats(&stats)
+	//common.WriteTimeStats(&stats)
+
+	key_owners, err := common.RevealKeyOwners(mc, key_distribution)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	server_key_counts := make(map[string]int)
+	for key, _ := range key_owners {
+		//log.Printf("server: %s\n\tkeys: %v\n\n", key, key_owners[key])
+		server_key_counts[key] = len(key_owners[key])
+	}
+
+	log.Printf("server key counts: %v\n\n", server_key_counts)
 }
