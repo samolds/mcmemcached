@@ -68,4 +68,12 @@ func main() {
 		common.OrderByValue(key_distribution))
 	log.Printf("Got %d cache misses for %d requests", cache_misses, n)
 	common.WriteTimeStats(&stats)
+
+	key_owners, err := common.RevealKeyOwners(mc, key_distribution)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	log.Printf("servers -> active_keys: %v", key_owners)
 }
