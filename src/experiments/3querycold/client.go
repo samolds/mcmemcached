@@ -28,11 +28,11 @@ func main() {
 	}
 
 	// the configurations being used
-    var old_mc *memcache.Client
-    old_valid := false
-    var active_mc *memcache.Client
-    //old_mc = config1
-    active_mc = config1
+	var old_mc *memcache.Client
+	old_valid := false
+	var active_mc *memcache.Client
+	//old_mc = config1
+	active_mc = config1
 
 	// initialize random number generator with a zipfian distribution
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -64,31 +64,31 @@ func main() {
 		_, err := active_mc.Get(key) // returns item, err
 		if err == memcache.ErrCacheMiss {
 			miss := true
-            if old_valid {
-                // Delay for consulting second memcached server
-                common.AddDelayPoint(&stats, fetch_delay)
+			if old_valid {
+				// Delay for consulting second memcached server
+				common.AddDelayPoint(&stats, fetch_delay)
 
-                _, er := old_mc.Get(key)
-                if er != memcache.ErrCacheMiss {
-                    miss = false
-                    active_mc.Set(&memcache.Item{Key: key, Value: []byte("fake value")})
+				_, er := old_mc.Get(key)
+				if er != memcache.ErrCacheMiss {
+					miss = false
+					active_mc.Set(&memcache.Item{Key: key, Value: []byte("fake value")})
 
-                    //log.Printf("Found key: '%s' in old configuration", key)
-                    // Delay for the first memcache server
-                    // since it won't be captured in a miss
-                    common.AddDelayPoint(&stats, fetch_delay)
-                }
-            }
+					//log.Printf("Found key: '%s' in old configuration", key)
+					// Delay for the first memcache server
+					// since it won't be captured in a miss
+					common.AddDelayPoint(&stats, fetch_delay)
+				}
+			}
 
-            if miss {
-                // cache miss, so add the key/value to the cache
-                common.AddDelayPoint(&stats, database_delay)
+			if miss {
+				// cache miss, so add the key/value to the cache
+				common.AddDelayPoint(&stats, database_delay)
 
-                cache_misses++
-                active_mc.Set(&memcache.Item{Key: key, Value: []byte("fake value")})
+				cache_misses++
+				active_mc.Set(&memcache.Item{Key: key, Value: []byte("fake value")})
 
-                //log.Printf("Using key: '%s', cache miss! adding to cache", key)
-            }
+				//log.Printf("Using key: '%s', cache miss! adding to cache", key)
+			}
 		} else {
 			common.AddDelayPoint(&stats, fetch_delay)
 			//log.Printf("\tUsing key: '%s', cache hit! value: '%#v'", key,
