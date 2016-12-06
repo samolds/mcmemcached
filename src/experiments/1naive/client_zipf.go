@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"math/rand"
@@ -49,6 +50,7 @@ func main() {
 		return
 	}
 
+	fmt.Printf("iteration,cache_miss_ratio\n")
 	// simulate n cache requests
 	n := 1000000
 	for i := 0; i < n; i++ {
@@ -71,6 +73,12 @@ func main() {
 			//log.Printf("\tUsing key: '%s', cache hit! value: '%#v'", key,
 			//	string(item.Value))
 		}
+
+		// ratio:
+		//fmt.Printf("%d,%0.3f\n", i+1, float64(cache_misses)/float64(i+1))
+
+		// non-ratio:
+		//fmt.Printf("%d,%d\n", i+1, cache_misses)
 	}
 
 	//log.Printf("Key access distribtuion {key access_count}: %v",
