@@ -25,7 +25,7 @@ func main() {
 
 	// initialize random number generator with a zipfian distribution
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	zipf := rand.NewZipf(r, 1.1, 5.0, 50000)
+	zipf := rand.NewZipf(r, 1.1, 5.0, 300000)
 
 	// print out the generated key distribution at the end
 	key_distribution := make(map[string]int)
@@ -50,7 +50,7 @@ func main() {
 	}
 
 	// simulate n cache requests
-	n := 100000
+	n := 1000000
 	for i := 0; i < n; i++ {
 		key := strconv.Itoa(int(zipf.Uint64())) // convert to string
 		key_distribution[key]++
