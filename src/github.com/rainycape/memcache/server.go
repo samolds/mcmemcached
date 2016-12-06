@@ -4,6 +4,7 @@ import (
 	"github.com/consistent"
 	"net"
 	"strings"
+    //"fmt"
 )
 
 // Servers is the interface used to manage a set of memcached
@@ -43,19 +44,21 @@ func NewServerList(servers ...string) (*ServerList, error) {
 	addrs := make([]*Addr, len(servers))
 	for i, server := range servers {
 		// Add server to consistent hash map
-		chash.Add(server)
+        //fmt.Println("Added server ", server, " to consistent hash")
 		if strings.Contains(server, "/") {
 			addr, err := net.ResolveUnixAddr("unix", server)
 			if err != nil {
 				return nil, err
 			}
 			addrs[i] = NewAddr(addr)
+            chash.Add(addr.String())
 		} else {
 			tcpaddr, err := net.ResolveTCPAddr("tcp", server)
 			if err != nil {
 				return nil, err
 			}
 			addrs[i] = NewAddr(tcpaddr)
+            chash.Add(tcpaddr.String())
 		}
 	}
 	return &ServerList{addrs: addrs, chash: chash}, nil
@@ -67,6 +70,10 @@ func (s *ServerList) PickServer(key string) (*Addr, error) {
 	}
 
 	server, err := s.chash.Get(key)
+    if err != nil {
+        return nil, err
+    }
+
 	server_index := 0
 
 	for key, val := range s.addrs {
