@@ -19,11 +19,11 @@ var (
 	FETCH_DELAY             float32 = 0.3
 	DATABASE_DELAY          float32 = 8.0
 	MEMCACHE_VALUE_FILENAME string  = "data/memcache_value.txt"
-	ITERATION_COUNT         int     = 1000000
+	ITERATION_COUNT         int     = 475000
 
 	ZIPF_S    float64 = 1.1
 	ZIPF_V    float64 = 5.0
-	ZIPF_IMAX uint64  = 300000
+	ZIPF_IMAX uint64  = 200000
 
 	PRINT_CACHE_MISS_RATIO bool = false
 	PRINT_TIME_STATS       bool = false

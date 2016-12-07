@@ -89,9 +89,11 @@ func main() {
 			log.Printf("\tAdded new server!! cache misses: %d, requests sent: %d\n",
 				cache_misses, i)
 			active_mc = config2
-			// TODO: add optimizations here. additional memcache server will be cold
-			// and will need to be caught up with existing key/value pairs all at once
-			// right here
+			err = catchUpColdServer(config1, config2, key_distribution)
+			if err != nil {
+				log.Fatal(err)
+				return
+			}
 		}
 
 		// for printing out csv data of cache misses for graphing ratio
@@ -111,5 +113,29 @@ func main() {
 	for _, hot_key_server := range hot_key_servers {
 		log.Printf("%s\n", hot_key_server.String(5))
 	}
+}
 
+// TODO(sam): add optimizations here. additional memcache server will be cold
+// and will need to be caught up with existing key/value pairs all at once
+// right here
+//
+// once we hit the threshold and moved from using 3 servers to 4, we'd need to
+// figure out which keys have been remapped to the new server. and once we've
+// figured out the hottest ~20 keys or something that have been remapped, we
+// just set those on the new server
+func catchUpColdServer(old_mc *memcached.Client, new_mc *memcached.Client,
+	key_distribution map[string]int) error {
+	// we know the cold server is going to be the 4th on in the new server list
+
+	// TODO(sam): wip
+	hot_key_servers, err := common.GetHotKeysPerServer(mc, key_distribution)
+	if err != nil {
+		return err
+	}
+
+	for _, hot_key_server := range hot_key_servers {
+		hot_key_server.KeyDistribution
+	}
+
+	return nil
 }
