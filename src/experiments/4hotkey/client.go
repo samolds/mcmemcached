@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io/ioutil"
 	"log"
 	"math/rand"
 	"strconv"
@@ -35,7 +36,7 @@ func main() {
 
 	// initialize random number generator with a zipfian distribution
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	zipf := rand.NewZipf(r, 1.1, 5.0, 50000)
+	zipf := rand.NewZipf(r, common.ZIPF_S, common.ZIPF_V, common.ZIPF_IMAX)
 
 	// print out the generated key distribution at the end
 	key_distribution := make(map[string]int)
@@ -44,35 +45,41 @@ func main() {
 	cache_misses := 0
 
 	// fake memcached fetch delay
-	var fetch_delay float32 = 0.3
+	var fetch_delay float32 = common.FETCH_DELAY
 
 	// fake database delay in milliseconds
-	var database_delay float32 = 8.0
+	var database_delay float32 = common.DATABASE_DELAY
 
 	var stats common.TimeStats
 
+	// read in a file that contains the value that will be set for every memcache
+	// key/value pair
+	memcache_value, err := ioutil.ReadFile(common.MEMCACHE_VALUE_FILENAME)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	// for printing out csv data of cache misses for graphing
+	common.WriteCacheMissRatioHeader()
+
 	// simulate n cache requests
-	n := 100000
+	n := common.ITERATION_COUNT
 	warm_up_its := n / 8 // give the servers an 8th of the iterations to "warm up"
 	for i := 0; i < n; i++ {
 		key := strconv.Itoa(int(zipf.Uint64())) // convert to string
 		key_distribution[key]++
 
 		// try and get the key from the cache
-		//item, err := active_mc.Get(key) // returns item, err
 		_, err := active_mc.Get(key) // returns item, err
 		if err == memcache.ErrCacheMiss {
 			common.AddDelayPoint(&stats, database_delay)
 
 			// cache miss, so add the key/value to the cache
 			cache_misses++
-			active_mc.Set(&memcache.Item{Key: key, Value: []byte("fake value")})
-
-			//log.Printf("Using key: '%s', cache miss! adding to cache", key)
+			active_mc.Set(&memcache.Item{Key: key, Value: memcache_value})
 		} else {
 			common.AddDelayPoint(&stats, fetch_delay)
-			//log.Printf("\tUsing key: '%s', cache hit! value: '%#v'", key,
-			//	string(item.Value))
 		}
 
 		// after a fraction of cache requests, to give servers time to "warm up",
@@ -86,10 +93,23 @@ func main() {
 			// and will need to be caught up with existing key/value pairs all at once
 			// right here
 		}
+
+		// for printing out csv data of cache misses for graphing ratio
+		common.WriteCacheMissRatio(cache_misses, i)
 	}
 
-	log.Printf("Key access distribtuion {key access_count}: %v",
-		common.OrderByValue(key_distribution))
-	log.Printf("Got %d cache misses for %d requests", cache_misses, n)
 	common.WriteTimeStats(&stats)
+
+	hot_key_servers, err := common.GetHotKeysPerServer(active_mc,
+		key_distribution)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	log.Printf("Got %d cache misses for %d requests", cache_misses, n)
+	for _, hot_key_server := range hot_key_servers {
+		log.Printf("%s\n", hot_key_server.String(5))
+	}
+
 }

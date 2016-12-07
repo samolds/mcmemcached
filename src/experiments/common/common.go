@@ -15,6 +15,18 @@ var (
 		"localhost:11213",
 		"localhost:11214",
 	}
+
+	FETCH_DELAY             float32 = 0.3
+	DATABASE_DELAY          float32 = 8.0
+	MEMCACHE_VALUE_FILENAME string  = "data/memcache_value.txt"
+	ITERATION_COUNT         int     = 1000000
+
+	ZIPF_S    float64 = 1.1
+	ZIPF_V    float64 = 5.0
+	ZIPF_IMAX uint64  = 300000
+
+	PRINT_CACHE_MISS_RATIO bool = false
+	PRINT_TIME_STATS       bool = false
 )
 
 // time stored in milliseconds
@@ -42,13 +54,29 @@ func AddDelayPoint(stats *TimeStats, delay float32) {
 }
 
 func WriteTimeStats(stats *TimeStats) {
-	for i, m := range stats.Means {
-		fmt.Printf("[%v, %v]", m.MeanValue, m.AtTime)
-		if i < len(stats.Means)-1 {
-			fmt.Printf(",")
+	if PRINT_TIME_STATS {
+		for i, m := range stats.Means {
+			fmt.Printf("[%v, %v]", m.MeanValue, m.AtTime)
+			if i < len(stats.Means)-1 {
+				fmt.Printf(",")
+			}
 		}
+		fmt.Printf("\n")
 	}
-	fmt.Printf("\n")
+}
+
+func WriteCacheMissRatioHeader() (int, error) {
+	if PRINT_CACHE_MISS_RATIO {
+		return fmt.Printf("iteration,cache_miss_ratio\n")
+	}
+	return 0, nil
+}
+
+func WriteCacheMissRatio(cache_misses int, i int) (int, error) {
+	if PRINT_CACHE_MISS_RATIO {
+		return fmt.Printf("%d,%0.3f\n", i+1, float64(cache_misses)/float64(i+1))
+	}
+	return 0, nil
 }
 
 type HotKeysPerServer struct {
