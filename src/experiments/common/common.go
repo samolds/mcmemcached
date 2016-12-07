@@ -1,6 +1,7 @@
 package common
 
 import (
+	"errors"
 	"fmt"
 	"sort"
 
@@ -48,6 +49,70 @@ func WriteTimeStats(stats *TimeStats) {
 		}
 	}
 	fmt.Printf("\n")
+}
+
+type HotKeysPerServer struct {
+	Server           string   // address of the server
+	Keys             []string // list of all keys active on server
+	KeyDistribution  PairList // ordered list of {key, hit_count} for all active keys
+	TotalKeyHitCount int      // the total aggregate hit_count for all keys on server
+}
+
+func (hk *HotKeysPerServer) String(num_top_keys int) string {
+	top_keys := make(map[string]float64)
+	for _, pair := range hk.KeyDistribution[:num_top_keys] {
+		top_keys[pair.Key] = float64(pair.Value) / float64(hk.TotalKeyHitCount)
+	}
+
+	return fmt.Sprintf("server: %s, num active keys: %d, %d hottest keys: %v",
+		hk.Server, len(hk.Keys), num_top_keys, top_keys)
+}
+
+// using the map of server to active keys and the map of all keys to counts,
+// builds up a list of HotKeys on each server
+func GetHotKeysPerServer(mc *memcache.Client,
+	key_distributions map[string]int) ([]HotKeysPerServer, error) {
+
+	var hot_keys []HotKeysPerServer
+	key_owners, err := RevealKeyOwners(mc, key_distributions)
+	if err != nil {
+		return hot_keys, err
+	}
+
+	// iterate through each of the servers that have active keys
+	for server, _ := range key_owners {
+		distribution := make(map[string]int)
+		active_server_keys, ok := key_owners[server]
+		if !ok {
+			return nil, errors.New("key didn't exist in key_owners")
+		}
+
+		total_key_hit_count := 0
+
+		// get the key distributions for just the keys active on each server
+		// we want to filter out the keys on other servers to just get the
+		// distribution of active keys on each individual server
+		for _, key := range active_server_keys {
+			count, ok := key_distributions[key]
+			if !ok {
+				return nil, errors.New("key didn't exist in key_distributions")
+			}
+
+			total_key_hit_count += count
+			distribution[key] = count
+		}
+
+		// build new struct that the server name, the active keys it has, and the
+		// distribution for each of those keys
+		hot_keys = append(hot_keys, HotKeysPerServer{
+			Server:           server,
+			Keys:             active_server_keys,
+			KeyDistribution:  OrderByValue(distribution),
+			TotalKeyHitCount: total_key_hit_count,
+		})
+	}
+
+	return hot_keys, nil
 }
 
 // performs a single get for each key in the key_distribution map to

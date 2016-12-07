@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	//"fmt"
 	"io/ioutil"
 	"log"
 	"math/rand"
@@ -50,7 +50,7 @@ func main() {
 		return
 	}
 
-	fmt.Printf("iteration,cache_miss_ratio\n")
+	//fmt.Printf("iteration,cache_miss_ratio\n")
 	// simulate n cache requests
 	n := 1000000
 	for i := 0; i < n; i++ {
@@ -86,17 +86,14 @@ func main() {
 	log.Printf("Got %d cache misses for %d requests", cache_misses, n)
 	//common.WriteTimeStats(&stats)
 
-	key_owners, err := common.RevealKeyOwners(mc, key_distribution)
+	hot_key_servers, err := common.GetHotKeysPerServer(mc,
+		key_distribution)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 
-	server_key_counts := make(map[string]int)
-	for key, _ := range key_owners {
-		//log.Printf("server: %s\n\tkeys: %v\n\n", key, key_owners[key])
-		server_key_counts[key] = len(key_owners[key])
+	for _, hot_key_server := range hot_key_servers {
+		log.Printf("%s\n", hot_key_server.String(5))
 	}
-
-	log.Printf("server key counts: %v\n\n", server_key_counts)
 }
