@@ -50,6 +50,7 @@ func main() {
 	}
 
 	// for printing out csv data of cache misses for graphing
+	common.WriteTimeStatsHeader()
 	common.WriteCacheMissRatioHeader()
 
 	// simulate n cache requests

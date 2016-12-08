@@ -26,7 +26,7 @@ var (
 	ZIPF_IMAX uint64  = 200000
 
 	PRINT_CACHE_MISS_RATIO bool = false
-	PRINT_TIME_STATS       bool = false
+	PRINT_TIME_STATS       bool = true
 )
 
 // time stored in milliseconds
@@ -53,15 +53,17 @@ func AddDelayPoint(stats *TimeStats, delay float32) {
 	stats.Means = append(stats.Means, pair)
 }
 
+func WriteTimeStatsHeader() {
+	if PRINT_TIME_STATS {
+		fmt.Printf("mean_response_time,time\n")
+	}
+}
+
 func WriteTimeStats(stats *TimeStats) {
 	if PRINT_TIME_STATS {
-		for i, m := range stats.Means {
-			fmt.Printf("[%v, %v]", m.MeanValue, m.AtTime)
-			if i < len(stats.Means)-1 {
-				fmt.Printf(",")
-			}
+		for _, m := range stats.Means {
+			fmt.Printf("%v,%v\n", m.MeanValue, m.AtTime)
 		}
-		fmt.Printf("\n")
 	}
 }
 
