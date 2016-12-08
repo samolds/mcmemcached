@@ -64,9 +64,14 @@ func main() {
 	common.WriteTimeStatsHeader()
 	common.WriteCacheMissRatioHeader()
 
+	// threshold of cache misses before adding 4th server
+	thresh := common.ADD_SERVER_THRESHOLD
+
 	// simulate n cache requests
 	n := common.ITERATION_COUNT
-	warm_up_its := n / 8 // give the servers an 8th of the iterations to "warm up"
+
+	// give the servers an 8th of the iterations to "warm up"
+	warm_up_its := n / common.WARM_UP_RATIO
 	for i := 0; i < n; i++ {
 		key := strconv.Itoa(int(zipf.Uint64())) // convert to string
 		key_distribution[key]++
@@ -86,11 +91,12 @@ func main() {
 		// after a fraction of cache requests, to give servers time to "warm up",
 		// if there have been more than 35% cache misses for the requests thus far,
 		// "spin up new server" (switch to configuration two with 4 cache servers)
-		if i > warm_up_its && (cache_misses*100)/i >= 25 && active_mc == config1 {
+		if i > warm_up_its && (cache_misses*100)/i >= thresh && active_mc == config1 {
 			log.Printf("\tAdded new server!! cache misses: %d, requests sent: %d\n",
 				cache_misses, i)
 			active_mc = config2
-			err = catchUpColdServer(config1, config2, key_distribution)
+			err = catchUpColdServer(config1, config2, key_distribution, &stats,
+				fetch_delay)
 			if err != nil {
 				log.Fatal(err)
 				return
@@ -103,17 +109,7 @@ func main() {
 
 	common.WriteTimeStats(&stats)
 
-	hot_key_servers, err := common.GetHotKeysPerServer(active_mc,
-		key_distribution)
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
-
-	log.Printf("Got %d cache misses for %d requests", cache_misses, n)
-	for _, hot_key_server := range hot_key_servers {
-		log.Printf("%s\n", hot_key_server.String(5))
-	}
+	common.LogResults(active_mc, key_distribution, cache_misses, n, memcache_value)
 }
 
 // once we hit the threshold and moved from using 3 servers to 4, we'd need to
@@ -121,7 +117,8 @@ func main() {
 // figured out the hottest ~20 keys or something that have been remapped, we
 // just set those on the new server
 func catchUpColdServer(old_mc *memcache.Client, new_mc *memcache.Client,
-	key_distribution map[string]int) error {
+	key_distribution map[string]int, stats *common.TimeStats,
+	fetch_delay float32) error {
 
 	// get all of the server objects from the memcache client
 	servers, err := new_mc.Servers.Servers()
@@ -175,8 +172,7 @@ func catchUpColdServer(old_mc *memcache.Client, new_mc *memcache.Client,
 		key_dist := hot_key_servers[server_index].KeyDistribution[index]
 		_, key_needs_remapping := remapped_keys[key_dist.Key]
 		if key_needs_remapping {
-			// TODO(sam): add sleep or something to indicate that server needs to go
-			// get the value from the old server
+			common.AddDelayPoint(stats, fetch_delay)
 			new_mc.Set(&memcache.Item{Key: key_dist.Key, Value: memcache_value})
 			percentage := float64(key_dist.Value) / float64(
 				hot_key_servers[server_index].TotalKeyHitCount)
@@ -191,6 +187,7 @@ func catchUpColdServer(old_mc *memcache.Client, new_mc *memcache.Client,
 	// iterate through all of the keys on each existing server from hottest to
 	// coldest until the new server has 20% of the hottest keys from the old
 	// servers
+	// TODO(sam): tweak this 20%
 	for total_key_hit_percentage < 20.0 {
 		key_hit_percentage, too_much := remap_key_from_old_to_new(0, index)
 		if too_much {

@@ -65,9 +65,14 @@ func main() {
 	common.WriteTimeStatsHeader()
 	common.WriteCacheMissRatioHeader()
 
+	// threshold of cache misses before adding 4th server
+	thresh := common.ADD_SERVER_THRESHOLD
+
 	// simulate n cache requests
 	n := common.ITERATION_COUNT
-	warm_up_its := n / 8 // give the servers an 8th of the iterations to "warm up"
+
+	// give the servers an 8th of the iterations to "warm up"
+	warm_up_its := n / common.WARM_UP_RATIO
 	for i := 0; i < n; i++ {
 		key := strconv.Itoa(int(zipf.Uint64())) // convert to string
 		key_distribution[key]++
@@ -85,7 +90,6 @@ func main() {
 					miss = false
 					active_mc.Set(&memcache.Item{Key: key, Value: memcache_value})
 
-					//log.Printf("Found key: '%s' in old configuration", key)
 					// Delay for the first memcache server
 					// since it won't be captured in a miss
 					common.AddDelayPoint(&stats, fetch_delay)
@@ -106,7 +110,7 @@ func main() {
 		// after a fraction of cache requests, to give servers time to "warm up",
 		// if there have been more than 35% cache misses for the requests thus far,
 		// "spin up new server" (switch to configuration two with 4 cache servers)
-		if i > warm_up_its && (cache_misses*100)/i >= 25 && active_mc == config1 {
+		if i > warm_up_its && (cache_misses*100)/i >= thresh && active_mc == config1 {
 			log.Printf("\tAdded new server!! cache misses: %d, requests sent: %d\n",
 				cache_misses, i)
 			active_mc = config2
@@ -118,15 +122,5 @@ func main() {
 
 	common.WriteTimeStats(&stats)
 
-	hot_key_servers, err := common.GetHotKeysPerServer(active_mc,
-		key_distribution)
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
-
-	log.Printf("Got %d cache misses for %d requests", cache_misses, n)
-	for _, hot_key_server := range hot_key_servers {
-		log.Printf("%s\n", hot_key_server.String(5))
-	}
+	common.LogResults(active_mc, key_distribution, cache_misses, n, memcache_value)
 }

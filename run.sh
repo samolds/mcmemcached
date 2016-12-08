@@ -35,15 +35,15 @@ fi
 sleep 2 # wait for 2 second for memcache servers to start
 
 if [ "$EXPERIMENT" = "1z" ]; then
-  go run src/experiments/1naive/client_zipf.go
+  go run src/experiments/1naive/client_zipf.go > data/time_stats_$EXPERIMENT.csv
 elif [ "$EXPERIMENT" = "1n" ]; then
-  go run src/experiments/1naive/client_n.go
+  go run src/experiments/1naive/client_n.go > data/time_stats_$EXPERIMENT.csv
 elif [ "$EXPERIMENT" = "2" ]; then
-  go run src/experiments/2coldstart/client.go
+  go run src/experiments/2coldstart/client.go > data/time_stats_$EXPERIMENT.csv
 elif [ "$EXPERIMENT" = "3" ]; then
-  go run src/experiments/3querycold/client.go
+  go run src/experiments/3querycold/client.go > data/time_stats_$EXPERIMENT.csv
 elif [ "$EXPERIMENT" = "4" ]; then
-  go run src/experiments/4hotkey/client.go
+  go run src/experiments/4hotkey/client.go > data/time_stats_$EXPERIMENT.csv
 fi
 
 # kills all 4 memcache servers (as well as any other processes named "memcached"

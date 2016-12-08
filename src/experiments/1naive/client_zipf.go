@@ -77,15 +77,5 @@ func main() {
 
 	common.WriteTimeStats(&stats)
 
-	hot_key_servers, err := common.GetHotKeysPerServer(mc,
-		key_distribution)
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
-
-	log.Printf("Got %d cache misses for %d requests", cache_misses, n)
-	for _, hot_key_server := range hot_key_servers {
-		log.Printf("%s\n", hot_key_server.String(5))
-	}
+	common.LogResults(mc, key_distribution, cache_misses, n, memcache_value)
 }

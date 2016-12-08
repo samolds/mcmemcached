@@ -1,6 +1,8 @@
 *.swp
 .DS_Store
 
+/data/time_stats_*
+
 ## TAKEN FROM https://github.com/github/gitignore/blob/master/C.gitignore ##
 # Prerequisites
 /memcached/*.d

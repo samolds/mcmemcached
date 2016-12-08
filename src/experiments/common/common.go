@@ -3,6 +3,7 @@ package common
 import (
 	"errors"
 	"fmt"
+	"log"
 	"sort"
 
 	"github.com/rainycape/memcache"
@@ -19,16 +20,19 @@ var (
 	FETCH_DELAY             float32 = 0.3
 	DATABASE_DELAY          float32 = 8.0
 	MEMCACHE_VALUE_FILENAME string  = "data/memcache_value.txt"
-	ITERATION_COUNT         int     = 475000 // 5000000 FOR HUGE WORKLOAD
+	ITERATION_COUNT         int     = 5000000 // 475000 // FOR HUGE WORKLOAD
 
 	ZIPF_S    float64 = 1.1
 	ZIPF_V    float64 = 5.0
-	ZIPF_IMAX uint64  = 200000 // 500000 FOR HUGE WORKLOAD
+	ZIPF_IMAX uint64  = 500000 // 200000 // FOR HUGE WORKLOAD
 
 	PRINT_CACHE_MISS_RATIO bool = false
 	PRINT_TIME_STATS       bool = true
 
-	STATS_ITERATIONS float32 = 100.0
+	STATS_WINDOW_SIZE float32 = 100.0
+
+	WARM_UP_RATIO        int = 8  // 1/WARM_UP_RATIO for time to allow initial warm up
+	ADD_SERVER_THRESHOLD int = 20 // 20% cache miss before adding new server
 )
 
 // time stored in milliseconds
@@ -53,7 +57,7 @@ func AddDelayPoint(stats *TimeStats, delay float32) {
 	stats.WindowCount = stats.WindowCount + 1
 	stats.RunTime = stats.RunTime + delay
 
-	if stats.WindowCount == STATS_ITERATIONS {
+	if stats.WindowCount == STATS_WINDOW_SIZE {
 		pair := TimePair{
 			MeanValue: stats.WindowSum / stats.WindowCount,
 			AtTime:    stats.RunTime,
@@ -91,6 +95,24 @@ func WriteCacheMissRatio(cache_misses int, i int) (int, error) {
 		return fmt.Printf("%d,%0.3f\n", i+1, float64(cache_misses)/float64(i+1))
 	}
 	return 0, nil
+}
+
+func LogResults(mc *memcache.Client, key_distribution map[string]int,
+	cache_misses int, n int, memcache_value []byte) {
+	hot_key_servers, err := GetHotKeysPerServer(mc, key_distribution)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	log.Printf("Generated %d unique keys and %0.2fMB of data",
+		len(key_distribution),
+		float32(len(key_distribution))*float32(len(memcache_value))/1000000.0)
+
+	log.Printf("Got %d cache misses for %d requests", cache_misses, n)
+	for _, hot_key_server := range hot_key_servers {
+		log.Printf("%s\n", hot_key_server.String(5))
+	}
 }
 
 type HotKeysPerServer struct {
