@@ -19,24 +19,24 @@ var (
 	FETCH_DELAY             float32 = 0.3
 	DATABASE_DELAY          float32 = 8.0
 	MEMCACHE_VALUE_FILENAME string  = "data/memcache_value.txt"
-	ITERATION_COUNT         int     = 475000
+	ITERATION_COUNT         int     = 475000 // 5000000 FOR HUGE WORKLOAD
 
 	ZIPF_S    float64 = 1.1
 	ZIPF_V    float64 = 5.0
-	ZIPF_IMAX uint64  = 200000
+	ZIPF_IMAX uint64  = 200000 // 500000 FOR HUGE WORKLOAD
 
 	PRINT_CACHE_MISS_RATIO bool = false
 	PRINT_TIME_STATS       bool = true
 
-	STATS_ITERATIONS int = 20
+	STATS_ITERATIONS float32 = 100.0
 )
 
 // time stored in milliseconds
 type TimeStats struct {
-	RunTime      float32
-	Means        []TimePair
-	WindowSum    float32
-	WindowCount  float32
+	RunTime     float32
+	Means       []TimePair
+	WindowSum   float32
+	WindowCount float32
 }
 
 type TimePair struct {
@@ -53,7 +53,7 @@ func AddDelayPoint(stats *TimeStats, delay float32) {
 	stats.WindowCount = stats.WindowCount + 1
 	stats.RunTime = stats.RunTime + delay
 
-	if (stats.WindowCount == STATS_ITERATIONS) {
+	if stats.WindowCount == STATS_ITERATIONS {
 		pair := TimePair{
 			MeanValue: stats.WindowSum / stats.WindowCount,
 			AtTime:    stats.RunTime,
