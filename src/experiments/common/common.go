@@ -22,8 +22,8 @@ var (
 	MEMCACHE_VALUE_FILENAME string  = "data/memcache_value.txt"
 	ITERATION_COUNT         int     = 475000
 
-	ZIPF_S    float64 = 1.1
-	ZIPF_V    float64 = 5.0
+	ZIPF_S    float64 = 1.01
+	ZIPF_V    float64 = 20.1
 	ZIPF_IMAX uint64  = 200000
 
 	PRINT_CACHE_MISS_RATIO bool = false
