@@ -85,7 +85,7 @@ func main() {
 		// after a fraction of cache requests, to give servers time to "warm up",
 		// if there have been more than 35% cache misses for the requests thus far,
 		// "spin up new server" (switch to configuration two with 4 cache servers)
-		if i > warm_up_its && (cache_misses*100)/i >= 35 && active_mc == config1 {
+		if i > warm_up_its && (cache_misses*100)/i >= 25 && active_mc == config1 {
 			log.Printf("\tAdded new server!! cache misses: %d, requests sent: %d\n",
 				cache_misses, i)
 			active_mc = config2
@@ -171,7 +171,7 @@ func catchUpColdServer(old_mc *memcache.Client, new_mc *memcache.Client,
 	// function to move a key from one server to another if it exists and return
 	// "how hot" that key was relative to the other keys it knows about
 	remap_key_from_old_to_new := func(server_index int, index int) (float64, bool) {
-		if len(hot_key_servers[server_index].KeyDistribution) < index {
+		if len(hot_key_servers[server_index].KeyDistribution) <= index {
 			return 0.0, true
 		}
 
