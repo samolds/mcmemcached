@@ -50,6 +50,15 @@ experiment against the servers:
 * `./run.sh`
 
 
+## To make plots with R:
+
+```
+setwd("~/Desktop")
+ee<-read.csv("time_stats_1z.csv")
+plot(x=ee$time, y=ee$mean_response_time, main="Experiment 1", ylab="Mean Response Time", xlab="Time (ms)", xlim=c(0,1200000), ylim=c(1,6))
+```
+
+
 # References
 * [Facebook Memcache](http://www.cs.utah.edu/~stutsman/cs6963/public/papers/memcached.pdf)
 * [Saving Cash by Using Less Cache](http://www.cs.cmu.edu/~harchol/Papers/HotCloud12.pdf)
