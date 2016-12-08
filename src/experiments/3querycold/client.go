@@ -106,7 +106,7 @@ func main() {
 		// after a fraction of cache requests, to give servers time to "warm up",
 		// if there have been more than 35% cache misses for the requests thus far,
 		// "spin up new server" (switch to configuration two with 4 cache servers)
-		if i > warm_up_its && (cache_misses*100)/i >= 35 && active_mc == config1 {
+		if i > warm_up_its && (cache_misses*100)/i >= 25 && active_mc == config1 {
 			log.Printf("\tAdded new server!! cache misses: %d, requests sent: %d\n",
 				cache_misses, i)
 			active_mc = config2
