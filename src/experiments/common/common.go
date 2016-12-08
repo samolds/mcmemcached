@@ -26,13 +26,17 @@ var (
 	ZIPF_IMAX uint64  = 200000
 
 	PRINT_CACHE_MISS_RATIO bool = false
-	PRINT_TIME_STATS       bool = false
+	PRINT_TIME_STATS       bool = true
+
+	STATS_ITERATIONS int = 20
 )
 
 // time stored in milliseconds
 type TimeStats struct {
-	RunTime float32
-	Means   []TimePair
+	RunTime      float32
+	Means        []TimePair
+	WindowSum    float32
+	WindowCount  float32
 }
 
 type TimePair struct {
@@ -45,12 +49,20 @@ type TimePair struct {
 // key-value fetch, 0.3 ms
 // goes to DB, 8 ms
 func AddDelayPoint(stats *TimeStats, delay float32) {
+	slice.WindowSum = slice.WindowSum + delay
+	slice.WindowCount = slice.WindowCount + 1
 	stats.RunTime = stats.RunTime + delay
-	pair := TimePair{
-		MeanValue: stats.RunTime / float32(len(stats.Means)+1),
-		AtTime:    stats.RunTime,
+
+	if (slice.WindowCount == STATS_ITERATIONS) {
+		pair := TimePair{
+			MeanValue: stats.WindowSum / slice.WindowCount,
+			AtTime:    stats.RunTime,
+		}
+		stats.Means = append(stats.Means, pair)
+
+		slice.WindowSum = 0
+		slice.WindowCount = 0
 	}
-	stats.Means = append(stats.Means, pair)
 }
 
 func WriteTimeStats(stats *TimeStats) {
