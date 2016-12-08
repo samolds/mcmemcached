@@ -49,19 +49,19 @@ type TimePair struct {
 // key-value fetch, 0.3 ms
 // goes to DB, 8 ms
 func AddDelayPoint(stats *TimeStats, delay float32) {
-	slice.WindowSum = slice.WindowSum + delay
-	slice.WindowCount = slice.WindowCount + 1
+	stats.WindowSum = stats.WindowSum + delay
+	stats.WindowCount = stats.WindowCount + 1
 	stats.RunTime = stats.RunTime + delay
 
-	if (slice.WindowCount == STATS_ITERATIONS) {
+	if (stats.WindowCount == STATS_ITERATIONS) {
 		pair := TimePair{
-			MeanValue: stats.WindowSum / slice.WindowCount,
+			MeanValue: stats.WindowSum / stats.WindowCount,
 			AtTime:    stats.RunTime,
 		}
 		stats.Means = append(stats.Means, pair)
 
-		slice.WindowSum = 0
-		slice.WindowCount = 0
+		stats.WindowSum = 0
+		stats.WindowCount = 0
 	}
 }
 
