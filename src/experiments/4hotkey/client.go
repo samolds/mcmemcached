@@ -95,8 +95,7 @@ func main() {
 			log.Printf("\tAdded new server!! cache misses: %d, requests sent: %d\n",
 				cache_misses, i)
 			active_mc = config2
-			err = catchUpColdServer(config1, config2, key_distribution, &stats,
-				fetch_delay)
+			err = catchUpColdServer(config1, config2, key_distribution)
 			if err != nil {
 				log.Fatal(err)
 				return
@@ -117,8 +116,7 @@ func main() {
 // figured out the hottest ~20 keys or something that have been remapped, we
 // just set those on the new server
 func catchUpColdServer(old_mc *memcache.Client, new_mc *memcache.Client,
-	key_distribution map[string]int, stats *common.TimeStats,
-	fetch_delay float32) error {
+	key_distribution map[string]int) error {
 
 	// get all of the server objects from the memcache client
 	servers, err := new_mc.Servers.Servers()
@@ -172,7 +170,6 @@ func catchUpColdServer(old_mc *memcache.Client, new_mc *memcache.Client,
 		key_dist := hot_key_servers[server_index].KeyDistribution[index]
 		_, key_needs_remapping := remapped_keys[key_dist.Key]
 		if key_needs_remapping {
-			common.AddDelayPoint(stats, fetch_delay)
 			new_mc.Set(&memcache.Item{Key: key_dist.Key, Value: memcache_value})
 			percentage := float64(key_dist.Value) / float64(
 				hot_key_servers[server_index].TotalKeyHitCount)

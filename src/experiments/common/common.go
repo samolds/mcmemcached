@@ -20,19 +20,19 @@ var (
 	FETCH_DELAY             float32 = 0.3
 	DATABASE_DELAY          float32 = 8.0
 	MEMCACHE_VALUE_FILENAME string  = "data/memcache_value.txt"
-	ITERATION_COUNT         int     = 5000000 // 475000 // FOR HUGE WORKLOAD
+	ITERATION_COUNT         int     = 475000
 
 	ZIPF_S    float64 = 1.1
 	ZIPF_V    float64 = 5.0
-	ZIPF_IMAX uint64  = 500000 // 200000 // FOR HUGE WORKLOAD
+	ZIPF_IMAX uint64  = 200000
 
 	PRINT_CACHE_MISS_RATIO bool = false
 	PRINT_TIME_STATS       bool = true
 
-	STATS_WINDOW_SIZE float32 = 100.0
+	STATS_WINDOW_SIZE float32 = 1000.0
 
-	WARM_UP_RATIO        int = 8  // 1/WARM_UP_RATIO for time to allow initial warm up
-	ADD_SERVER_THRESHOLD int = 20 // 20% cache miss before adding new server
+	WARM_UP_RATIO        int = 2  // 1/WARM_UP_RATIO for time to allow initial warm up
+	ADD_SERVER_THRESHOLD int = 10 // 10% cache miss before adding new server
 )
 
 // time stored in milliseconds
