@@ -62,3 +62,10 @@ plot(x=ee$time, y=ee$mean_response_time, main="Experiment 1", ylab="Mean Respons
 # References
 * [Facebook Memcache](http://www.cs.utah.edu/~stutsman/cs6963/public/papers/memcached.pdf)
 * [Saving Cash by Using Less Cache](http://www.cs.cmu.edu/~harchol/Papers/HotCloud12.pdf)
+
+
+# Contributors:
+
+* [Keith Downie](https://github.com/kdownie)
+* [Rehan Ghori](https://www.linkedin.com/in/mohammad-rehan-ghori-4402542)
+* [Sam Olds](https://github.com/samolds)
